@@ -1460,11 +1460,25 @@ public class GHRepository extends GHObject {
      *             the io exception
      */
     public GHRepository fork() throws IOException {
+        return fork(root().getMyself());
+    }
+
+    /**
+     * Forks this repository as your repository. It allows forking using GitHub app authentication
+     *
+     * @param user
+     *            the user
+     * @return Newly forked repository that belong to you.
+     * @throws IOException
+     *             the io exception
+     * @see GHApp#getOwner() () GHApp#getOwner()
+     */
+    public GHRepository fork(GHUser user) throws IOException {
         root().createRequest().method("POST").withUrlPath(getApiTailUrl("forks")).send();
 
         // this API is asynchronous. we need to wait for a bit
         for (int i = 0; i < 10; i++) {
-            GHRepository r = root().getMyself().getRepository(name);
+            GHRepository r = user.getRepository(name);
             if (r != null) {
                 return r;
             }
